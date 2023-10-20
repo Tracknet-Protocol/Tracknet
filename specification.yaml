@@ -2,9 +2,39 @@ openapi: 3.0.2
 info:
   title: TRACKNET Protocol
   version: 1.0
-  description: Protocol to standardize GPS data sharing between fleet owners and consumers.
+  description: |
+    # Introduction
+    Tracknet is a standardized protocol designed to facilitate the sharing of GPS data between fleet owners and consumers (shippers or transporters). It ensures efficient communication, privacy, and real-time data sharing using various methods.
+    
+    ## Workflow Specifications
+    ### Workflow 1: QR Code
+    - **Step 1**: QR Code Generation by Fleet Owner
+    - **Step 2**: QR Code Consumption by Consumer
+
+    ### Workflow 2: URL Based 
+    - **Step 1**: URL Generation by GPS Provider
+    - **Step 2**: URL Consumption by Consumer
+
+    ### Workflow 3: Request-Based
+    - **Step 1**: Request Initiation by Consumer
+    - **Step 2**: Fleet Owner Notification by GPS Provider
+    - **Step 3**: Fleet Owner Response
+    
+    ## Data Structures
+    Common JSON Data Structure provided below.
+    
+    ## Security Considerations
+    - **Token Generation**: Tokens should be randomly generated, with a suitable length, and using cryptographic methods to ensure security.
+    - **Token Expiry**: Tokens should have a limited lifespan to prevent prolonged unauthorized access.
+    - **Data Transmission**: All data transmissions should be carried out over HTTPS to ensure data integrity and security.
+    - **Authorization & Authentication**: Before data access, proper checks should be in place to ensure that the entity requesting data has the appropriate permissions.
+
+    ## Conclusions
+    Tracknet protocol provides a standardized method for sharing GPS data, ensuring efficiency, flexibility, and security. With its versatile workflows, it accommodates various scenarios for fleet owners and consumers, fostering real-time collaboration and decision-making.
+    
 servers:
   - url: 'https://api.tracknet.com'
+
 paths:
   /retrieveData:
     post:
@@ -22,6 +52,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GPSDataResponse'
+  
   /requestTracking:
     post:
       summary: Initiate request-based tracking
@@ -60,6 +91,7 @@ paths:
                 properties:
                   status:
                     type: string
+
 components:
   schemas:
     Location:
@@ -120,3 +152,4 @@ components:
           type: string
         vehicleNumber:
           type: string
+
