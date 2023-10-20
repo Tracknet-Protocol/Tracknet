@@ -1,155 +1,103 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
-  title: TRACKNET Protocol
-  version: 1.0
+  title: 'Tracknet Protocol'
+  version: '1.0.0'
+  contact:
+    name: Tracknet Standards Consortium
+    url: https://github.com/tracknet/tsc
+  license:
+    name: Tracknet Protocol Specification V1 License
+    url: https://github.com/tracknet/tsc/blob/main/LICENSE.md
   description: |
     # Introduction
+
     Tracknet is a standardized protocol designed to facilitate the sharing of GPS data between fleet owners and consumers (shippers or transporters). It ensures efficient communication, privacy, and real-time data sharing using various methods.
-    
+
     ## Workflow Specifications
+
     ### Workflow 1: QR Code
-    - **Step 1**: QR Code Generation by Fleet Owner
-    - **Step 2**: QR Code Consumption by Consumer
+    1. **QR Code Generation by Fleet Owner**
+      - Fleet owner chooses:
+        - Vehicle
+        - Till Time (Mandatory)
+        - From Time (Defaults to the current time)
+        - From Location (Optional)
+        - Till Location (Optional)
+    2. **QR Code Consumption by Consumer**
+      - The consumer scans the QR code.
+      - The QR code contains the token and other necessary details.
+      - A URL (provided by the GPS provider) is invoked periodically to fetch the location.
 
     ### Workflow 2: URL Based 
-    - **Step 1**: URL Generation by GPS Provider
-    - **Step 2**: URL Consumption by Consumer
+    1. **URL Generation by GPS Provider**
+      - The process is similar to Workflow 1 but generates a URL instead.
+    2. **URL Consumption by Consumer**
+      - The consumer accesses the URL.
+      - The URL response provides the token and other necessary details.
+      - A URL is invoked periodically to fetch the location.
 
     ### Workflow 3: Request-Based
-    - **Step 1**: Request Initiation by Consumer
-    - **Step 2**: Fleet Owner Notification by GPS Provider
-    - **Step 3**: Fleet Owner Response
-    
+    1. **Request Initiation by Consumer**
+      - The consumer selects a vehicle and the GPS provider from their application.
+      - Sends a request containing request details.
+    2. **Fleet Owner Notification by GPS Provider**
+      - GPS provider sends a push notification to the fleet owner.
+    3. **Fleet Owner Response**
+      - If accepted, tracking commences based on the provided details.
+
     ## Data Structures
-    Common JSON Data Structure provided below.
-    
+
+    The common JSON Data Structure used in the protocol:
+    ```json
+    {
+      "vehicleNumber": "XYZ1234",
+      "fromTime": "2023-10-20T14:30:00Z",
+      "tillTime": "2023-10-20T18:30:00Z",
+      "fromLocation": {
+        "latitude": 12.971598,
+        "longitude": 77.594566
+      },
+      "tillLocation": {
+        "latitude": 12.965620,
+        "longitude": 77.610116
+      },
+      "token": "abcd1234efgh5678"
+    }
+    ```
+
     ## Security Considerations
-    - **Token Generation**: Tokens should be randomly generated, with a suitable length, and using cryptographic methods to ensure security.
-    - **Token Expiry**: Tokens should have a limited lifespan to prevent prolonged unauthorized access.
-    - **Data Transmission**: All data transmissions should be carried out over HTTPS to ensure data integrity and security.
-    - **Authorization & Authentication**: Before data access, proper checks should be in place to ensure that the entity requesting data has the appropriate permissions.
+
+    - **Token Generation**: Securely generate tokens using cryptographic methods.
+    - **Token Expiry**: Set a limited lifespan for tokens.
+    - **Data Transmission**: Use HTTPS to ensure data security and integrity.
+    - **Authorization & Authentication**: Implement proper checks to ensure appropriate permissions.
 
     ## Conclusions
-    Tracknet protocol provides a standardized method for sharing GPS data, ensuring efficiency, flexibility, and security. With its versatile workflows, it accommodates various scenarios for fleet owners and consumers, fostering real-time collaboration and decision-making.
-    
-servers:
-  - url: 'https://api.tracknet.com'
 
-paths:
-  /retrieveData:
-    post:
-      summary: Retrieve GPS data
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GPSDataRequest'
-      responses:
-        '200':
-          description: GPS data for the given time frame
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GPSDataResponse'
-  
-  /requestTracking:
-    post:
-      summary: Initiate request-based tracking
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TrackingRequest'
-      responses:
-        '200':
-          description: Acknowledgment of the tracking request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-  /webhookNotification:
-    post:
-      summary: Webhook notification for tracking status
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationRequest'
-      responses:
-        '200':
-          description: Acknowledgment of the notification
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
+    The Tracknet protocol offers a standardized method to share GPS data, ensuring efficiency, flexibility, and security. Its diverse workflows cater to various scenarios for fleet owners and consumers, fostering real-time collaboration and decision-making.
 
-components:
-  schemas:
-    Location:
-      type: object
-      properties:
-        latitude:
-          type: number
-        longitude:
-          type: number
-    GPSDataRequest:
-      type: object
-      properties:
-        vehicleNumber:
-          type: string
-        fromTime:
-          type: string
-          format: date-time
-        tillTime:
-          type: string
-          format: date-time
-        fromLocation:
-          $ref: '#/components/schemas/Location'
-        tillLocation:
-          $ref: '#/components/schemas/Location'
-        token:
-          type: string
-    GPSDataResponse:
-      type: object
-      properties:
-        vehicleNumber:
-          type: string
-        currentLocation:
-          $ref: '#/components/schemas/Location'
-        timestamp:
-          type: string
-          format: date-time
-    TrackingRequest:
-      type: object
-      properties:
-        vehicleNumber:
-          type: string
-        fromTime:
-          type: string
-          format: date-time
-        tillTime:
-          type: string
-          format: date-time
-        fromLocation:
-          $ref: '#/components/schemas/Location'
-        tillLocation:
-          $ref: '#/components/schemas/Location'
-        callbackURL:
-          type: string
-    NotificationRequest:
-      type: object
-      properties:
-        status:
-          type: string
-        vehicleNumber:
-          type: string
+    ## System Architecture
 
+    ### Components:
+    - **Fleet Owner Interface**: Enables fleet owners to set tracking parameters and generate QR codes or URLs.
+    - **Consumer Interface**: Enables consumers to scan QR codes, access URLs, or begin a request-based tracking method.
+    - **GPS Provider Backend**: Processes requests, creates tokens, provides data to consumers, and notifies fleet owners.
+    - **Database**: Holds vehicle tracking data, fleet owner preferences, active tokens, and other essential information.
+
+    ## API Endpoints
+
+    - **Data Retrieval Endpoint**:
+      - Endpoint: /retrieveData
+      - Method: POST
+      - Response: GPS data within the desired timeframe.
+    - **Request-Based Tracking Endpoint**:
+      - Endpoint: /requestTracking
+      - Method: POST
+      - Response: Acknowledgment of the request.
+    - **Webhook Notification Endpoint**:
+      - Endpoint: /webhookNotification
+      - Method: POST
+      - Response: Acknowledgment of the notification.
+
+    Document Revision: 1.0
+    Date: October 20, 2023
