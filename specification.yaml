@@ -1,0 +1,120 @@
+openapi: 3.0.2
+info:
+  title: TRACKNET Protocol
+  version: 1.0
+  description: Protocol to standardize GPS data sharing between fleet owners and consumers.
+servers:
+  - url: 'https://api.tracknet.com'
+paths:
+  /retrieveData:
+    post:
+      summary: Retrieve GPS data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPSDataRequest'
+      responses:
+        '200':
+          description: GPS data for the given time frame
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPSDataResponse'
+  /requestTracking:
+    post:
+      summary: Initiate request-based tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackingRequest'
+      responses:
+        '200':
+          description: Acknowledgment of the tracking request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  /webhookNotification:
+    post:
+      summary: Webhook notification for tracking status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '200':
+          description: Acknowledgment of the notification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+components:
+  schemas:
+    GPSDataRequest:
+      type: object
+      properties:
+        vehicleNumber:
+          type: string
+        fromTime:
+          type: string
+          format: date-time
+        tillTime:
+          type: string
+          format: date-time
+        fromLocation:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        tillLocation:
+          $ref: '#/components/schemas/fromLocation'
+        token:
+          type: string
+    GPSDataResponse:
+      type: object
+      properties:
+        vehicleNumber:
+          type: string
+        currentLocation:
+          $ref: '#/components/schemas/fromLocation'
+        timestamp:
+          type: string
+          format: date-time
+    TrackingRequest:
+      type: object
+      properties:
+        vehicleNumber:
+          type: string
+        fromTime:
+          type: string
+          format: date-time
+        tillTime:
+          type: string
+          format: date-time
+        fromLocation:
+          $ref: '#/components/schemas/fromLocation'
+        tillLocation:
+          $ref: '#/components/schemas/fromLocation'
+        callbackURL:
+          type: string
+    NotificationRequest:
+      type: object
+      properties:
+        status:
+          type: string
+        vehicleNumber:
+          type: string
