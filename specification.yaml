@@ -62,6 +62,13 @@ paths:
                     type: string
 components:
   schemas:
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
     GPSDataRequest:
       type: object
       properties:
@@ -74,14 +81,9 @@ components:
           type: string
           format: date-time
         fromLocation:
-          type: object
-          properties:
-            latitude:
-              type: number
-            longitude:
-              type: number
+          $ref: '#/components/schemas/Location'
         tillLocation:
-          $ref: '#/components/schemas/fromLocation'
+          $ref: '#/components/schemas/Location'
         token:
           type: string
     GPSDataResponse:
@@ -90,7 +92,7 @@ components:
         vehicleNumber:
           type: string
         currentLocation:
-          $ref: '#/components/schemas/fromLocation'
+          $ref: '#/components/schemas/Location'
         timestamp:
           type: string
           format: date-time
@@ -106,9 +108,9 @@ components:
           type: string
           format: date-time
         fromLocation:
-          $ref: '#/components/schemas/fromLocation'
+          $ref: '#/components/schemas/Location'
         tillLocation:
-          $ref: '#/components/schemas/fromLocation'
+          $ref: '#/components/schemas/Location'
         callbackURL:
           type: string
     NotificationRequest:
